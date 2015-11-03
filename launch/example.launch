@@ -1,0 +1,10 @@
+<launch>
+  <node name="$(anon optitrack_node)" pkg="vision_pkg_indigo" type="streamnode" output="screen" respawn="true">
+    
+    <param name="local_ip" value="128.178.145.117"/>
+    <param name="use_thread" value="false"/>
+    <param name="publish_frequency" value="250"/>
+    <!--param name="obj_list" value="myobj1_root myobj2_root"-->   //enable this tag to track specific objects only, otherwise it tracks everything.
+    <!--param name="calib_file" value="mycalibfile.txt"-->   //enable this to load a calibration file and get the correct /vision and /robot frames on the tf
+  </node>
+</launch>
