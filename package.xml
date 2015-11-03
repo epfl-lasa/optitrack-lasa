@@ -39,7 +39,7 @@
   <!--   <run_depend>message_runtime</run_depend> -->
   <!-- Use test_depend for packages you need only for testing: -->
   <!--   <test_depend>gtest</test_depend> -->
-
+  <buildtool_depend>catkin</buildtool_depend>
   <build_depend> roscpp </build_depend>
   <build_depend> tf </build_depend>
   
@@ -48,12 +48,10 @@
   <run_depend> tf </run_depend>
   
 
-  <buildtool_depend>catkin</buildtool_depend>
-
   <!-- The export tag contains other, unspecified, tags -->
-  <export>
     <!-- Other tools can request additional information be placed here -->
 <!--    <cpp cflags="-I${prefix}/include" lflags="-lOptiTrack -lboost_thread-mt -L${prefix}/lib"/>-->
-    <cpp cflags="-I${prefix}/include" lflags="-lOptiTrack -lboost_thread-mt -L${prefix}/lib"/>
-  </export>
+
+<export> <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -Wl,-rpath,${prefix}/lib -lvision_pkg "/> </export>
+
 </package>

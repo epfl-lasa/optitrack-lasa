@@ -1,5 +1,5 @@
-#include "VisionPkg/OptiTrack.h"
-#include "VisionPkg/Calibrator.h"
+#include "OptiTrack.h"
+#include "Calibrator.h"
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>

@@ -1,4 +1,4 @@
-#include "VisionPkg/OptiTrack.h"
+#include "OptiTrack.h"
 #include <iostream>
 
 #define NORM_TOLERANCE 0.01

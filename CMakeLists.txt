@@ -4,8 +4,11 @@ project(vision_pkg)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED tf roscpp)
-
+find_package(catkin REQUIRED COMPONENTS 
+  tf 
+  roscpp
+)
+ 
 ## System dependencies are found with CMake's conventions
 find_package(Boost REQUIRED COMPONENTS system)
 
@@ -76,8 +79,8 @@ find_package(Boost REQUIRED COMPONENTS system)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES VisionPkg_indigo
+  INCLUDE_DIRS include
+  LIBRARIES ${PROJECT_NAME}
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
 )
@@ -88,21 +91,30 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+include_directories(include)
+include_directories(
+  ${catkin_INCLUDE_DIRS} 
+)
+include_directories(
+  ${Boost_INCLUDE_DIRS}
+)
 
-add_library(OptiTrack src/OptiTrack.cpp src/Calibrator.cpp )
+
+FILE(GLOB theHeaderFiles include/OptiTrack.h include/Calibrator.h)
+FILE(GLOB theSourceFiles src/OptiTrack.cpp src/Calibrator.cpp )
+add_library(${PROJECT_NAME} ${theHeaderFiles} ${theSourceFiles} )
 #target_link_libraries(OptiTrack boost_thread-mt)
-target_link_libraries(OptiTrack ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 
-add_executable(Tester src/test.cpp)
-target_link_libraries(Tester OptiTrack ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+add_executable(TesterOP src/test.cpp)
+target_link_libraries(TesterOP ${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 add_executable(streamnode src/streamnode.cpp)
-target_link_libraries(streamnode OptiTrack ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(streamnode ${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 add_executable(streamnode_multirobot src/streamnode_multirobot.cpp)
-target_link_libraries(streamnode_multirobot OptiTrack ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(streamnode_multirobot ${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 
 

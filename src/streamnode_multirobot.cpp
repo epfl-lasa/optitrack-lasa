@@ -19,7 +19,7 @@
  */
 
 
-#include "VisionPkg/OptiTrack.h"
+#include "OptiTrack.h"
 #include <ros/ros.h>
 #include <tf/transform_broadcaster.h>
 #include "tf/tf.h"
