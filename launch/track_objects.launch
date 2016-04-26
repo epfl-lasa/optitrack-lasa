@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="local_ip"             default="128.178.145.215"/>
+  <arg name="use_thread"           default="false"/>
+  <arg name="publish_frequency"    default="125"/>
+  <arg name="obj_list"             default=""/>
+  <arg name="calib_file"           default="$(find vision_pkg)/KUKAVisionCalib.txt"/>
+
+  <node name="$(anon optitrack_node)" pkg="vision_pkg" type="streamnode" output="screen" respawn="true">
+
+    <param name="local_ip"           value="$(arg local_ip)"/>
+    <param name="use_thread"         value="$(arg use_thread)"/>
+    <param name="publish_frequency"  value="$(arg publish_frequency)"/>
+    <!-- <param name="obj_list"         value="$(arg obj_list)"/> -->
+    <!-- <param name="calib_file"         value="$(arg calib_file)"/> -->
+
+  </node>
+</launch>
