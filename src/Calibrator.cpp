@@ -50,20 +50,18 @@ void Calibrator::resetCalibration()
 }
 
 
-bool Calibrator::addCalibrationPoint(double *robot_ee_pose, double *vision_ee_pose)
+bool Calibrator::addCalibrationPoint(double *robot_ee_pose,
+                                     double *vision_ee_pose)
 {
-  if(vision_ee_pose[0] ==0 && vision_ee_pose[1] ==0 && vision_ee_pose[2] == 0)
-  {
+  if(vision_ee_pose[0] ==0 && vision_ee_pose[1] ==0 && vision_ee_pose[2] == 0) {
     cout<<"\nInvalid Vision position (0,0,0) captured.\nData point not added!"<<endl;
     return false;
   }
-  if(robot_ee_pose[0] ==0 && robot_ee_pose[1] == 0 && robot_ee_pose[2] == 0)
-  {
+  if(robot_ee_pose[0] ==0 && robot_ee_pose[1] == 0 && robot_ee_pose[2] == 0) {
     cout<<"\nInvalid Robot position (0,0,0) captured.\nData point not added!"<<endl;
     return false;
   }
-  if(pose_count>= DATAPOINTSNO)
-  {
+  if(pose_count>= DATAPOINTSNO) {
     cout<<"\nMaximum no. of calibration points reached ("<<DATAPOINTSNO<<").\nNo further points can be added";
     return false;
   }
@@ -105,22 +103,19 @@ bool Calibrator::solveCalibration(double **rotation, double *trans)
   double vision_avg[3] = {0.0, 0.0, 0.0};
 
   for(int i =0; i<pose_count; i++)
-    for(int j=0; j<3; j++)
-    {
+    for(int j=0; j<3; j++) {
       robot_avg[j] += robot_pose[i][j];
       vision_avg[j] += vision_pose[i][j];
     }
 
-  for(int i = 0; i<3; i++)
-  {
+  for(int i = 0; i<3; i++) {
     robot_avg[i] = robot_avg[i]/pose_count;
     vision_avg[i] = vision_avg[i]/pose_count;
   }
 
   double **vision_c_pose = new double*[DATAPOINTSNO];
   double **robot_c_pose = new double*[DATAPOINTSNO];
-  for(int i=0; i<DATAPOINTSNO; i++)
-  {
+  for(int i=0; i<DATAPOINTSNO; i++) {
     vision_c_pose[i] = new double[3];
     robot_c_pose[i] = new double[3];
   }
@@ -128,8 +123,7 @@ bool Calibrator::solveCalibration(double **rotation, double *trans)
 
 
   for(int i= 0; i<pose_count; i++)
-    for(int j=0; j<3; j++)
-    {
+    for(int j=0; j<3; j++) {
       robot_c_pose[i][j] = robot_pose[i][j] - robot_avg[j];
       vision_c_pose[i][j] = vision_pose[i][j] - vision_avg[j];
     }
@@ -153,35 +147,32 @@ bool Calibrator::solveCalibration(double **rotation, double *trans)
   double **V =  new double*[3];
   double **Ht = new double*[3];
   double **temp= new double*[3];
-  for(int i =0; i<3; i++)
-  {
+  for(int i =0; i<3; i++) {
     V[i] = new double[3];
     Ht[i] = new double[3];
     temp[i] = new double[1];
   }
   MatrixTranspose(H, Ht, 3, 3);
   double **Htemp = new double*[4];
-  for(int i=0; i<4; i++)
-  {
+  for(int i=0; i<4; i++) {
     Htemp[i] = new double[4];
     V1[i] = new double[4];
 
   }
 
   for(int i=1; i<4; i++)
-    for(int j = 1; j<4; j++)
-    {
+    for(int j = 1; j<4; j++) {
       Htemp[i][j] = H[i-1][j-1];
     }
 
-  Htemp[0][0] = Htemp[0][1] = Htemp[0][2] = Htemp[0][3] = Htemp[1][0] = Htemp[2][0] = Htemp[3][0] = 0;
+  Htemp[0][0] = Htemp[0][1] = Htemp[0][2] = Htemp[0][3] = Htemp[1][0] =
+                                Htemp[2][0] = Htemp[3][0] = 0;
 
   svdcmp(Htemp, 3, 3, w, V1);
 
 
   for(int i=0; i<3; i++)
-    for(int j=0; j<3; j++)
-    {
+    for(int j=0; j<3; j++) {
       H[i][j] = Htemp[i+1][j+1];
       V[i][j] = V1[i+1][j+1];
     }
@@ -199,8 +190,7 @@ bool Calibrator::solveCalibration(double **rotation, double *trans)
   double *temp2 = new double[3];
 
   for (int i=0; i<3; i++)
-    for(int j=0; j<3; j++)
-    {
+    for(int j=0; j<3; j++) {
       temp2[i] += rotation[i][j]*vision_avg[j] ;
     }
 
@@ -208,18 +198,15 @@ bool Calibrator::solveCalibration(double **rotation, double *trans)
     trans[i] = robot_avg[i] - temp2[i];
   //	rotmatrix = rotation;
   cout<<"Rot: "<<endl;
-  for(int i =0; i<3; i++)
-  {
-    for(int j=0; j<3; j++)
-    {
+  for(int i =0; i<3; i++) {
+    for(int j=0; j<3; j++) {
       rotmatrix[i][j] = rotation[i][j];
       cout<<rotmatrix[i][j]<<"  ";
     }
     cout<<endl;
   }
   cout<<"Trans: "<<endl;
-  for(int i=0; i<3; i++)
-  {
+  for(int i=0; i<3; i++) {
     transmatrix[i] = trans[i];
     cout<<transmatrix[i]<<"  ";
   }
@@ -234,10 +221,8 @@ void Calibrator::saveCalibration(const char *filename)
 {
   //	filename = "/home/saurav/calibresult.txt";
   FILE *calib = fopen(filename, "w");
-  for(int i=0; i<3; i++)
-  {
-    for(int j=0; j<3; j++)
-    {
+  for(int i=0; i<3; i++) {
+    for(int j=0; j<3; j++) {
       fprintf(calib,"%lf \t", rotmatrix[i][j]);
 
     }
@@ -254,8 +239,7 @@ void Calibrator::saveCalibration(const char *filename)
 
 void Calibrator::gettransformation(double **rot, double *tran)
 {
-  for(int i=0; i<3; i++)
-  {
+  for(int i=0; i<3; i++) {
     for(int j=0; j<3; j++)
       rot[i][j] = rotmatrix[i][j];
     tran[i] = transmatrix[i];
@@ -266,10 +250,11 @@ void Calibrator::gettransformation(double **rot, double *tran)
 void Calibrator::recordData()
 {
   FILE *data = fopen("calibdata.txt", "w");
-  for(int i=0; i<pose_count; i++)
-  {
-    fprintf(data, "%lf %lf %lf ", robot_pose[i][0], robot_pose[i][1], robot_pose[i][2]);
-    fprintf(data, "%lf %lf %lf \n", vision_pose[i][0], vision_pose[i][1], vision_pose[i][2]);
+  for(int i=0; i<pose_count; i++) {
+    fprintf(data, "%lf %lf %lf ", robot_pose[i][0], robot_pose[i][1],
+            robot_pose[i][2]);
+    fprintf(data, "%lf %lf %lf \n", vision_pose[i][0], vision_pose[i][1],
+            vision_pose[i][2]);
   }
   fclose(data);
 }
@@ -300,8 +285,7 @@ void Calibrator::PrintCalibError()
   //	MatrixPrint(rotmatrix, 3,3);
 
   for(int i=0; i<pose_count; i++)
-    for(int j=0; j<3; j++)
-    {
+    for(int j=0; j<3; j++) {
       error[j][i] += transmatrix[j] - robot_pose[i][j];
       if(error[j][i]> max_error)
         max_error = error[j][i];
@@ -357,20 +341,20 @@ void Calibrator::PrintCalibError()
 //}
 
 // matrixA is mXp matrixB is nXp Result is mXn
-void Calibrator::MatrixMultipy(double **MatrixA, double **MatrixB, double **Result, int m, int n, int p)
+void Calibrator::MatrixMultipy(double **MatrixA, double **MatrixB,
+                               double **Result, int m, int n, int p)
 {
   for(int i=0; i<m; i++)
-    for(int j=0; j<n; j++)
-    {
+    for(int j=0; j<n; j++) {
       Result[i][j] = 0;
-      for(int k=0; k<p; k++)
-      {
+      for(int k=0; k<p; k++) {
         Result[i][j] += MatrixA[i][k]*MatrixB[k][j];
       }
     }
 }
 
-void Calibrator::MatrixTranspose(double **matrix, double **transpose, int row, int column)
+void Calibrator::MatrixTranspose(double **matrix, double **transpose, int row,
+                                 int column)
 {
   for( int i= 0; i< row; i++)
     for(int j=0; j<column; j++)
@@ -468,8 +452,7 @@ void Calibrator::MatrixTranspose(double **matrix, double **transpose, int row, i
 
 void Calibrator::MatrixPrint(double ** matrix, int row, int column)
 {
-  for(int i=0; i<row; i++)
-  {
+  for(int i=0; i<row; i++) {
     for(int j=0; j<column; j++)
       cout<<matrix[i][j]<<"\t";
     cout<<endl;
@@ -487,7 +470,7 @@ and B.P. Flannery
 
 
 double **Calibrator::dmatrix(int nrl, int nrh, int ncl, int nch)
-    /* allocate a double matrix with subscript range m[nrl..nrh][ncl..nch] */
+/* allocate a double matrix with subscript range m[nrl..nrh][ncl..nch] */
 {
   int i,nrow=nrh-nrl+1,ncol=nch-ncl+1;
   double **m;
@@ -499,13 +482,13 @@ double **Calibrator::dmatrix(int nrl, int nrh, int ncl, int nch)
   m[nrl]=(double *) malloc((size_t)((nrow*ncol+NR_END)*sizeof(double)));
   m[nrl] += NR_END;
   m[nrl] -= ncl;
-  for(i=nrl+1;i<=nrh;i++) m[i]=m[i-1]+ncol;
+  for(i=nrl+1; i<=nrh; i++) m[i]=m[i-1]+ncol;
   /* return pointer to array of pointers to rows */
   return m;
 }
 
 double *Calibrator::dvector(int nl, int nh)
-    /* allocate a double vector with subscript range v[nl..nh] */
+/* allocate a double vector with subscript range v[nl..nh] */
 {
   double *v;
   v=(double *)malloc((size_t) ((nh-nl+1+NR_END)*sizeof(double)));
@@ -513,13 +496,13 @@ double *Calibrator::dvector(int nl, int nh)
 }
 
 void Calibrator::free_dvector(double *v, int nl, int nh)
-    /* free a double vector allocated with dvector() */
+/* free a double vector allocated with dvector() */
 {
   free((FREE_ARG) (v+nl-NR_END));
 }
 
 double Calibrator::pythag(double a, double b)
-    /* compute (a2 + b2)^1/2 without destructive underflow or overflow */
+/* compute (a2 + b2)^1/2 without destructive underflow or overflow */
 {
   double absa,absb;
   absa=fabs(a);
@@ -530,26 +513,26 @@ double Calibrator::pythag(double a, double b)
 
 /******************************************************************************/
 void Calibrator::svdcmp(double **a, int m, int n, double w[], double **v)
-    /*******************************************************************************
+/*******************************************************************************
 Given a matrix a[1..m][1..n], this routine computes its singular value
 decomposition, A = U.W.VT.  The matrix U replaces a on output.  The diagonal
 matrix of singular values W is output as a vector w[1..n].  The matrix V (not
 the transpose VT) is output as v[1..n][1..n].
-    *******************************************************************************/
+*******************************************************************************/
 {
   int flag,i,its,j,jj,k,l=0,nm;
   double anorm,c,f,g,h,s,scale,x,y,z,*rv1;
 
   rv1=dvector(1,n);
   g=scale=anorm=0.0; /* Householder reduction to bidiagonal form */
-  for (i=1;i<=n;i++) {
+  for (i=1; i<=n; i++) {
     l=i+1;
     rv1[i]=scale*g;
     g=s=scale=0.0;
     if (i <= m) {
-      for (k=i;k<=m;k++) scale += fabs(a[k][i]);
+      for (k=i; k<=m; k++) scale += fabs(a[k][i]);
       if (scale) {
-        for (k=i;k<=m;k++) {
+        for (k=i; k<=m; k++) {
           a[k][i] /= scale;
           s += a[k][i]*a[k][i];
         }
@@ -557,20 +540,20 @@ the transpose VT) is output as v[1..n][1..n].
         g = -SIGN(sqrt(s),f);
         h=f*g-s;
         a[i][i]=f-g;
-        for (j=l;j<=n;j++) {
-          for (s=0.0,k=i;k<=m;k++) s += a[k][i]*a[k][j];
+        for (j=l; j<=n; j++) {
+          for (s=0.0,k=i; k<=m; k++) s += a[k][i]*a[k][j];
           f=s/h;
-          for (k=i;k<=m;k++) a[k][j] += f*a[k][i];
+          for (k=i; k<=m; k++) a[k][j] += f*a[k][i];
         }
-        for (k=i;k<=m;k++) a[k][i] *= scale;
+        for (k=i; k<=m; k++) a[k][i] *= scale;
       }
     }
     w[i]=scale *g;
     g=s=scale=0.0;
     if (i <= m && i != n) {
-      for (k=l;k<=n;k++) scale += fabs(a[i][k]);
+      for (k=l; k<=n; k++) scale += fabs(a[i][k]);
       if (scale) {
-        for (k=l;k<=n;k++) {
+        for (k=l; k<=n; k++) {
           a[i][k] /= scale;
           s += a[i][k]*a[i][k];
         }
@@ -578,51 +561,51 @@ the transpose VT) is output as v[1..n][1..n].
         g = -SIGN(sqrt(s),f);
         h=f*g-s;
         a[i][l]=f-g;
-        for (k=l;k<=n;k++) rv1[k]=a[i][k]/h;
-        for (j=l;j<=m;j++) {
-          for (s=0.0,k=l;k<=n;k++) s += a[j][k]*a[i][k];
-          for (k=l;k<=n;k++) a[j][k] += s*rv1[k];
+        for (k=l; k<=n; k++) rv1[k]=a[i][k]/h;
+        for (j=l; j<=m; j++) {
+          for (s=0.0,k=l; k<=n; k++) s += a[j][k]*a[i][k];
+          for (k=l; k<=n; k++) a[j][k] += s*rv1[k];
         }
-        for (k=l;k<=n;k++) a[i][k] *= scale;
+        for (k=l; k<=n; k++) a[i][k] *= scale;
       }
     }
     anorm = DMAX(anorm,(fabs(w[i])+fabs(rv1[i])));
   }
-  for (i=n;i>=1;i--) { /* Accumulation of right-hand transformations. */
+  for (i=n; i>=1; i--) { /* Accumulation of right-hand transformations. */
     if (i < n) {
       if (g) {
-        for (j=l;j<=n;j++) /* Double division to avoid possible underflow. */
+        for (j=l; j<=n; j++) /* Double division to avoid possible underflow. */
           v[j][i]=(a[i][j]/a[i][l])/g;
-        for (j=l;j<=n;j++) {
-          for (s=0.0,k=l;k<=n;k++) s += a[i][k]*v[k][j];
-          for (k=l;k<=n;k++) v[k][j] += s*v[k][i];
+        for (j=l; j<=n; j++) {
+          for (s=0.0,k=l; k<=n; k++) s += a[i][k]*v[k][j];
+          for (k=l; k<=n; k++) v[k][j] += s*v[k][i];
         }
       }
-      for (j=l;j<=n;j++) v[i][j]=v[j][i]=0.0;
+      for (j=l; j<=n; j++) v[i][j]=v[j][i]=0.0;
     }
     v[i][i]=1.0;
     g=rv1[i];
     l=i;
   }
-  for (i=IMIN(m,n);i>=1;i--) { /* Accumulation of left-hand transformations. */
+  for (i=IMIN(m,n); i>=1; i--) { /* Accumulation of left-hand transformations. */
     l=i+1;
     g=w[i];
-    for (j=l;j<=n;j++) a[i][j]=0.0;
+    for (j=l; j<=n; j++) a[i][j]=0.0;
     if (g) {
       g=1.0/g;
-      for (j=l;j<=n;j++) {
-        for (s=0.0,k=l;k<=m;k++) s += a[k][i]*a[k][j];
+      for (j=l; j<=n; j++) {
+        for (s=0.0,k=l; k<=m; k++) s += a[k][i]*a[k][j];
         f=(s/a[i][i])*g;
-        for (k=i;k<=m;k++) a[k][j] += f*a[k][i];
+        for (k=i; k<=m; k++) a[k][j] += f*a[k][i];
       }
-      for (j=i;j<=m;j++) a[j][i] *= g;
-    } else for (j=i;j<=m;j++) a[j][i]=0.0;
+      for (j=i; j<=m; j++) a[j][i] *= g;
+    } else for (j=i; j<=m; j++) a[j][i]=0.0;
     ++a[i][i];
   }
-  for (k=n;k>=1;k--) { /* Diagonalization of the bidiagonal form. */
-    for (its=1;its<=30;its++) {
+  for (k=n; k>=1; k--) { /* Diagonalization of the bidiagonal form. */
+    for (its=1; its<=30; its++) {
       flag=1;
-      for (l=k;l>=1;l--) { /* Test for splitting. */
+      for (l=k; l>=1; l--) { /* Test for splitting. */
         nm=l-1; /* Note that rv1[1] is always zero. */
         if ((double)(fabs(rv1[l])+anorm) == anorm) {
           flag=0;
@@ -633,7 +616,7 @@ the transpose VT) is output as v[1..n][1..n].
       if (flag) {
         c=0.0; /* Cancellation of rv1[l], if l > 1. */
         s=1.0;
-        for (i=l;i<=k;i++) {
+        for (i=l; i<=k; i++) {
           f=s*rv1[i];
           rv1[i]=c*rv1[i];
           if ((double)(fabs(f)+anorm) == anorm) break;
@@ -643,7 +626,7 @@ the transpose VT) is output as v[1..n][1..n].
           h=1.0/h;
           c=g*h;
           s = -f*h;
-          for (j=1;j<=m;j++) {
+          for (j=1; j<=m; j++) {
             y=a[j][nm];
             z=a[j][i];
             a[j][nm]=y*c+z*s;
@@ -655,7 +638,7 @@ the transpose VT) is output as v[1..n][1..n].
       if (l == k) { /* Convergence. */
         if (z < 0.0) { /* Singular value is made nonnegative. */
           w[k] = -z;
-          for (j=1;j<=n;j++) v[j][k] = -v[j][k];
+          for (j=1; j<=n; j++) v[j][k] = -v[j][k];
         }
         break;
       }
@@ -669,7 +652,7 @@ the transpose VT) is output as v[1..n][1..n].
       g=pythag(f,1.0);
       f=((x-z)*(x+z)+h*((y/(f+SIGN(g,f)))-h))/x;
       c=s=1.0; /* Next QR transformation: */
-      for (j=l;j<=nm;j++) {
+      for (j=l; j<=nm; j++) {
         i=j+1;
         g=rv1[i];
         y=w[i];
@@ -683,7 +666,7 @@ the transpose VT) is output as v[1..n][1..n].
         g = g*c-x*s;
         h=y*s;
         y *= c;
-        for (jj=1;jj<=n;jj++) {
+        for (jj=1; jj<=n; jj++) {
           x=v[jj][j];
           z=v[jj][i];
           v[jj][j]=x*c+z*s;
@@ -698,7 +681,7 @@ the transpose VT) is output as v[1..n][1..n].
         }
         f=c*g+s*y;
         x=c*y-s*g;
-        for (jj=1;jj<=m;jj++) {
+        for (jj=1; jj<=m; jj++) {
           y=a[jj][j];
           z=a[jj][i];
           a[jj][j]=y*c+z*s;

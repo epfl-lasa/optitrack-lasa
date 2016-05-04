@@ -36,23 +36,23 @@ std::string trim(std::string const& str)
   else return str.substr(first, last-first+1);
 }
 
-void explode(std::string str, std::vector<std::string>& members) {
+void explode(std::string str, std::vector<std::string>& members)
+{
   std::string delimiters = " ,;:";
   size_t current;
   size_t next = -1;
-  do
-  {
+  do {
     current = next + 1;
     next = str.find_first_of( delimiters, current );
     std::string s = trim(str.substr( current, next - current ));
     if(s.length() != 0) {
       members.push_back(s);
     }
-  }
-  while (next != string::npos);
+  } while (next != string::npos);
 }
 
-tf::StampedTransform newInitialRobotFrame(unsigned int robot_num) {
+tf::StampedTransform newInitialRobotFrame(unsigned int robot_num)
+{
   tf::StampedTransform tmp;
   tmp.setIdentity();
   char buf[100];
@@ -103,8 +103,7 @@ int main(int argc, char** argv)
 
   tracker = new OptiTrack();
   int ret;
-  if((ret = tracker->Init(localip.c_str(), bUseThread)) <= 0)
-  {
+  if((ret = tracker->Init(localip.c_str(), bUseThread)) <= 0) {
     if(ret == -1)
       ROS_FATAL("Cannot open socket. Check local ip!");
     else if(ret == -2)
@@ -113,11 +112,11 @@ int main(int argc, char** argv)
   }
   tracker->enableWarnings(false);
 
-  std::string calibfile; bool bUseCalibration = false;
+  std::string calibfile;
+  bool bUseCalibration = false;
 
 
-  if(nh_private.getParam("calib_file", calibfile))
-  {
+  if(nh_private.getParam("calib_file", calibfile)) {
 
     std::vector<std::string> all_calib_files;
     explode(calibfile, all_calib_files);
@@ -127,15 +126,12 @@ int main(int argc, char** argv)
       file = fopen(all_calib_files[f].c_str(), "r");
 
       robotTf.push_back(newInitialRobotFrame(f));
-      if(file == NULL)
-      {
+      if(file == NULL) {
         ROS_WARN_STREAM("Calibration file \""<<calibfile<<"\" not found for robot number "<<f<<". Robot frame will be identity.");
-      }
-      else
-      {
+      } else {
         int dum;
-        for(int i=0;i<3;i++)
-          for(int j=0;j<3;j++)
+        for(int i=0; i<3; i++)
+          for(int j=0; j<3; j++)
             dum = fscanf(file, "%lf", &(orient[i][j]));
 
         btm.setValue(orient[0][0], orient[0][1], orient[0][2],
@@ -144,7 +140,7 @@ int main(int argc, char** argv)
 
 
 
-        for(int j=0;j<3;j++)
+        for(int j=0; j<3; j++)
           dum = fscanf(file, "%lf", &(pos[j]));
 
         tmpV3.setValue(pos[0], pos[1], pos[2]);
@@ -172,19 +168,16 @@ int main(int argc, char** argv)
   exists &= nh_private.getParam("obj_list", objlist);
 
 
-  if(!exists)				// If parameter obj_list does not exist, track all objects available
-  {
+  if(!exists) {			// If parameter obj_list does not exist, track all objects available
     obj_names = tracker->GetRBodyNameList();
-  }
-  else					// If parameter obj_list exists, retrieve object names from the delimited list string
-  {
+  } else {				// If parameter obj_list exists, retrieve object names from the delimited list string
 
     explode(objlist, obj_names);
   }
 
   std::string tmp = "";
   unsigned int i;
-  for(i=0;i<obj_names.size()-1;i++)
+  for(i=0; i<obj_names.size()-1; i++)
     tmp = tmp + obj_names[i] + " ; ";
 
   tmp = tmp + obj_names[i];
@@ -197,7 +190,7 @@ int main(int argc, char** argv)
   ROS_INFO_STREAM("use_thread = " << bUseThread);
   ROS_INFO_STREAM("use_calibration = " << bUseCalibration);
 
-  for(i=0;i<num_obj;i++)
+  for(i=0; i<num_obj; i++)
     tracker->enableRBody(obj_names[i].c_str(), true);
 
   ros::Rate r(publish_frequency);
@@ -206,8 +199,7 @@ int main(int argc, char** argv)
   if(num_obj)
     transforms.resize(num_obj);
 
-  for(i=0;i<num_obj;i++)
-  {
+  for(i=0; i<num_obj; i++) {
     transforms[i].child_frame_id_ = obj_names[i];
     transforms[i].frame_id_ = "vision";
     transforms[i].setIdentity();
@@ -228,22 +220,19 @@ int main(int argc, char** argv)
   transforms.push_back(visionTf);
 
   ROS_INFO("TF Broadcaster started");
-  while(ros::ok())
-  {
+  while(ros::ok()) {
     ros::spinOnce();
 
-    if(tracker->Update() < 0)
-    {
+    if(tracker->Update() < 0) {
       ROS_ERROR_STREAM_THROTTLE(1, "Tracker update failed");
       break;
     }
 
-    for(i=0;i<num_obj;i++)
-    {
-      if(!tracker->getRBodyPosition(pos, obj_names[i].c_str()) || !tracker->getRBodyOrientation(orient, obj_names[i].c_str()))
+    for(i=0; i<num_obj; i++) {
+      if(!tracker->getRBodyPosition(pos, obj_names[i].c_str())
+         || !tracker->getRBodyOrientation(orient, obj_names[i].c_str()))
         ROS_WARN_STREAM_THROTTLE(1, "Object " << obj_names[i] << " not detected");
-      else
-      {
+      else {
         btm.setValue(orient[0][0], orient[0][1], orient[0][2],
                      orient[1][0], orient[1][1], orient[1][2],
                      orient[2][0], orient[2][1], orient[2][2]);

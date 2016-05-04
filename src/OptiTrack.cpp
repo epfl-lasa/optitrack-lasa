@@ -32,43 +32,36 @@ void MarkerSet::print()
 
 void Rigid::print()
 {
-  if(set)
-  {
+  if(set) {
     //		cout<<"\nBool:"<<set<<endl;
     cout<<endl<<"Rigid Body ID:\t"<<ID<<endl
         <<"Name:\t"<<szRBodyName<<endl
         <<"position:\t"<<x<<"\t"<<y<<" \t"<<z<<endl
         <<"orientation:\t"<<qx<<"\t"<<qy<<"\t"<<qz<<"\t"<<qw<<endl
         <<"No. of Rigid Body Markers:\t"<<nRigidMarkers<<endl;
-    if(bMarkers)
-    {
+    if(bMarkers) {
       cout<<endl<<"Marker Details:\n";
-      for(int i = 0; i<nRigidMarkers; i++)
-      {
+      for(int i = 0; i<nRigidMarkers; i++) {
         RMarkers[i].print();
       }
       cout<<endl<<"Mean Marker Error: "<<fError<<endl;
     }
-  }
-  else
+  } else
     cout<<"\nRigid body details can't be printed"<<endl;
 }
 
 void Skeleton::print()
 {
   cout<<"\nBool:"<<set<<endl;
-  if(set)
-  {
+  if(set) {
     cout<<endl<<"Skeleton ID:\t"<<ID<<endl
         <<"Name:\t"<<szSkeletonName<<endl
         <<"No. of  Rigid Bodies:\t"<<nRigidBodies<<endl
         <<"List & Details of Rigid Bodies:"<<endl;
-    for(int i =0; i<nRigidBodies; i++)
-    {
+    for(int i =0; i<nRigidBodies; i++) {
       RBodies[i].print();
     }
-  }
-  else
+  } else
     cout<<"\nSkeleton details can't be printed "<<endl;
 }
 
@@ -91,8 +84,7 @@ OptiTrack::OptiTrack()
 OptiTrack::~OptiTrack()
 {
 
-  if(bUseThread && isInit)
-  {
+  if(bUseThread && isInit) {
     bStopRequested = true;
     mThread->join();
   }
@@ -108,29 +100,23 @@ bool OptiTrack::loadCalibrationMatrix(const char *filename)
   int dummy;
   FILE *calib= fopen(filename, "r+");
   double norm = 0.0;
-  if(!calib)
-  {
+  if(!calib) {
     bCalibrate = false;
     cout<<"ERROR: Calibration file not found!!"<<endl;
     return false;
   }
 
-  for(int i=0; i<3; i++)
-  {
-    for(int j=0; j<3; j++)
-    {
+  for(int i=0; i<3; i++) {
+    for(int j=0; j<3; j++) {
       dummy = fscanf(calib,"%lf", &(rotmatrix[i][j]));
     }
   }
 
-  for(int j=0; j<3; j++)
-  {
-    for(int i=0; i<3; i++)
-    {
+  for(int j=0; j<3; j++) {
+    for(int i=0; i<3; i++) {
       norm += rotmatrix[i][j]*rotmatrix[i][j];
     }
-    if(norm<UNIT-NORM_TOLERANCE || norm>UNIT+NORM_TOLERANCE)
-    {
+    if(norm<UNIT-NORM_TOLERANCE || norm>UNIT+NORM_TOLERANCE) {
       cout<<"Rotation Matrix Not normalized or Invalid.Calibration not loaded."<<endl;
       bCalibrate = false;
       return false;
@@ -144,8 +130,7 @@ bool OptiTrack::loadCalibrationMatrix(const char *filename)
   fclose(calib);
   cout<<"Calibration file: "<<filename<<" loaded!"<<endl;
   cout<<"Rotation :"<<endl;
-  for(int i=0; i<3; i++)
-  {
+  for(int i=0; i<3; i++) {
     for(int j=0; j<3; j++)
       cout<<rotmatrix[i][j]<<" \t";
     cout<<endl;
@@ -160,15 +145,12 @@ bool OptiTrack::loadCalibrationMatrix(double *rotation[3], double *translate)
 {
   double norm;
   norm =0.0;
-  for(int j=0; j<3; j++)
-  {
-    for(int i=0; i<3; i++)
-    {
+  for(int j=0; j<3; j++) {
+    for(int i=0; i<3; i++) {
       rotmatrix[i][j] = rotation[i][j];
       norm += rotmatrix[i][j]*rotmatrix[i][j];
     }
-    if(norm<UNIT-NORM_TOLERANCE || norm>UNIT+NORM_TOLERANCE)
-    {
+    if(norm<UNIT-NORM_TOLERANCE || norm>UNIT+NORM_TOLERANCE) {
       cout<<"Rotation Matrix Not normalized or Invalid.\nRotation matrix not loaded."<<endl;
       bCalibrate = false;
       return false;
@@ -179,8 +161,7 @@ bool OptiTrack::loadCalibrationMatrix(double *rotation[3], double *translate)
   }
 
   cout<<"Rotation :"<<endl;
-  for(int i=0; i<3; i++)
-  {
+  for(int i=0; i<3; i++) {
     for(int j=0; j<3; j++)
       cout<<rotmatrix[i][j]<<" \t";
     cout<<endl;
@@ -207,9 +188,12 @@ void OptiTrack::CalibratePos(double* position)
   double y = position[1];
   double z = position[2];
 
-  position[0] = rotmatrix[0][0]*x + rotmatrix[0][1]*y + rotmatrix[0][2]*z + transmatrix[0];
-  position[1] = rotmatrix[1][0]*x + rotmatrix[1][1]*y + rotmatrix[1][2]*z + transmatrix[1];
-  position[2] = rotmatrix[2][0]*x + rotmatrix[2][1]*y + rotmatrix[2][2]*z + transmatrix[2];
+  position[0] = rotmatrix[0][0]*x + rotmatrix[0][1]*y + rotmatrix[0][2]*z +
+                transmatrix[0];
+  position[1] = rotmatrix[1][0]*x + rotmatrix[1][1]*y + rotmatrix[1][2]*z +
+                transmatrix[1];
+  position[2] = rotmatrix[2][0]*x + rotmatrix[2][1]*y + rotmatrix[2][2]*z +
+                transmatrix[2];
 
   //	cout<<"\nCalibrated Positions:\t"<<xtemp<<"\t"<<ytemp<<"\t"<<ztemp<<endl;
 }
@@ -217,17 +201,16 @@ void OptiTrack::CalibratePos(double* position)
 void OptiTrack::CalibrateOrient(double orient[][3])
 {
 
-  for(int i=0;i<3;i++)
-    for(int j=0;j<3;j++)
-    {
+  for(int i=0; i<3; i++)
+    for(int j=0; j<3; j++) {
       tmpRotMat[i][j] = 0;
 
-      for(int k=0;k<3;k++)
+      for(int k=0; k<3; k++)
         tmpRotMat[i][j] += rotmatrix[i][k]*orient[k][j];
     }
 
-  for(int i=0;i<3;i++)
-    for(int j=0;j<3;j++)
+  for(int i=0; i<3; i++)
+    for(int j=0; j<3; j++)
       orient[i][j] = tmpRotMat[i][j];
 
 }
@@ -240,43 +223,32 @@ void OptiTrack::UpdateFunc()
   FD_SET(sd, &rdfs);
 
   int read_result;
-  while(!bStopRequested)
-  {
-    if(isOpened)
-    {
-      if(bStart)
-      {
+  while(!bStopRequested) {
+    if(isOpened) {
+      if(bStart) {
         struct timeval tm;
         tm.tv_sec = 1;
         tm.tv_usec = 000;
         read_result = select(sd+1, &rdfs, NULL, NULL, &tm);
 
-        if(read_result == -1)
-        {
-          if(bPrintWarnings)
-          {
+        if(read_result == -1) {
+          if(bPrintWarnings) {
             cout<<"ERROR while selecing socket"<<endl;
             cout<<"Stopping thread"<<endl;
           }
           bStart = false;
-        }
-        else if(read_result)
-        {
+        } else if(read_result) {
           mutex->lock();
           read_result = receivedata();
           mutex->unlock();
-        }
-        else
-        {
+        } else {
           bStart = false;
           if(bPrintWarnings)
             cout<<"Stopping thread"<<endl;
         }
 
       }
-    }
-    else
-    {
+    } else {
       //			cout<<"Socket not openend!!"<<endl;
       continue;
     }
@@ -291,8 +263,7 @@ int OptiTrack::Init(const char* local_ip, bool useThread)
   bUseThread = useThread;
   cout<<"Initializing..."<<endl;
   memcpy(local_ip_addr, local_ip, sizeof(local_ip));
-  if(!SocketOpen(local_ip))
-  {
+  if(!SocketOpen(local_ip)) {
     cout<<"Cannot open socket with the specified ip. Check your local ip!!"<<endl;
     return -1;
   }
@@ -304,34 +275,28 @@ int OptiTrack::Init(const char* local_ip, bool useThread)
   timeout.tv_usec = 0000;
 
   int read_result = select(sd+1, &mFdset, NULL, NULL, &timeout);
-  if(read_result == -1)
-  {
+  if(read_result == -1) {
     cout<<"Select failed on socket!"<<endl;
     return -2;
-  }
-  else if(!read_result)
-  {
+  } else if(!read_result) {
     cout<<"No data on socket!"<<endl;
     return -2;
   }
 
   cout<<"Trying to receive data...";
-  if(!receivedata())
-  {
+  if(!receivedata()) {
     cout<<"Cannot receive data!!"<<endl;
     return -2;
   }
   Start();
   usleep(100000);
 
-  if(Refresh()< 0)
-  {
+  if(Refresh()< 0) {
     cout<<"Cannot refresh"<<endl;
     return -2;
   }
 
-  if(bUseThread)
-  {
+  if(bUseThread) {
     cout<<"Creating thread...";
     mThread = new boost::thread(boost::bind(&OptiTrack::UpdateFunc, this));
     mutex = new boost::mutex();
@@ -343,7 +308,8 @@ int OptiTrack::Init(const char* local_ip, bool useThread)
 
 }
 
-void OptiTrack::MatrixFromQuat(double qx, double qy, double qz, double qw, double rotmat[][3])
+void OptiTrack::MatrixFromQuat(double qx, double qy, double qz, double qw,
+                               double rotmat[][3])
 {
   rotmat[0][0] = qx*qx + qw*qw - qz*qz - qy*qy ;
   rotmat[0][1] = 2*(qx*qy - qz*qw);
@@ -360,10 +326,8 @@ void OptiTrack::MatrixFromQuat(double qx, double qy, double qz, double qw, doubl
 
 bool OptiTrack::RBidtoname(int &rid, char *rbname)
 {
-  for(unsigned int i=0; i<RigidIDs.size(); i++)
-  {
-    if( rid == RigidIDs[i])
-    {
+  for(unsigned int i=0; i<RigidIDs.size(); i++) {
+    if( rid == RigidIDs[i]) {
       strcpy(rbname, Rigidname[i].c_str());
       return true;
     }
@@ -374,10 +338,8 @@ bool OptiTrack::RBidtoname(int &rid, char *rbname)
 
 bool OptiTrack::RBnametoid(int &rid, char *rbname)
 {
-  for(long int i=0; i<(long)RigidIDs.size(); i++)
-  {
-    if( strcmp(rbname, Rigidname[i].c_str()))
-    {
+  for(long int i=0; i<(long)RigidIDs.size(); i++) {
+    if( strcmp(rbname, Rigidname[i].c_str())) {
       rid = RigidIDs[i];
       return true;
     }
@@ -417,19 +379,15 @@ vector<string> OptiTrack::GetSkeletonNameList()
 
 void OptiTrack::DisplayInfo()
 {
-  if(RigidIDs.size()>0)
-  {
+  if(RigidIDs.size()>0) {
     cout<<"Displaying list of rigid bodies...\nID \t \t Name "<<endl;
-    for(long int i =0; i<(long)RigidIDs.size(); i++)
-    {
+    for(long int i =0; i<(long)RigidIDs.size(); i++) {
       cout<<RigidIDs[i]<<"\t \t "<<Rigidname[i]<<endl;
     }
   }
-  if(skeletonIDs.size()>0)
-  {
+  if(skeletonIDs.size()>0) {
     cout<<"Displaying list of skeletons...\nID \t \t Name "<<endl;
-    for(long int i =0; i<(long)RigidIDs.size(); i++)
-    {
+    for(long int i =0; i<(long)RigidIDs.size(); i++) {
       cout<<skeletonIDs[i]<<"\t \t "<<skeletonname[i]<<endl;
     }
 
@@ -438,10 +396,8 @@ void OptiTrack::DisplayInfo()
 
 bool OptiTrack::enableRBody(int rid, bool details)
 {
-  for(long int i=0; i<(long)RigidIDs.size(); i++)
-  {
-    if(RigidIDs[i] == rid)
-    {
+  for(long int i=0; i<(long)RigidIDs.size(); i++) {
+    if(RigidIDs[i] == rid) {
       getRID.push_back(rid);
       bRDetails.push_back(details);
 
@@ -464,12 +420,11 @@ bool OptiTrack::enableRBody(const char *rbname, bool details)
 {
 
 
-  for(long int i=0; i<(long)Rigidname.size(); i++)
-  {
-    if(strcmp(Rigidname[i].c_str(), rbname) == 0)
-    {
+  for(long int i=0; i<(long)Rigidname.size(); i++) {
+    if(strcmp(Rigidname[i].c_str(), rbname) == 0) {
 
-      getRID.push_back(RigidIDs[i]);		//adding the rigid ID corresponding to rigid name
+      getRID.push_back(
+        RigidIDs[i]);		//adding the rigid ID corresponding to rigid name
       bRDetails.push_back(details);
       sRNames.push_back(rbname);
       if(bPrintWarnings)
@@ -485,12 +440,9 @@ bool OptiTrack::enableRBody(const char *rbname, bool details)
 
 bool OptiTrack::disableRBody(int rid)
 {
-  if(getRID.size()>0)
-  {
-    for(long i =0; i<(long)getRID.size(); i++)
-    {
-      if(rid == getRID.at(i))
-      {
+  if(getRID.size()>0) {
+    for(long i =0; i<(long)getRID.size(); i++) {
+      if(rid == getRID.at(i)) {
         if(bPrintWarnings)
           cout<<"Rigid Body ID: "<<getRID.at(i)<<" disabled"<<endl;
         getRID.erase(getRID.begin()+i);
@@ -503,20 +455,16 @@ bool OptiTrack::disableRBody(int rid)
       cout<<"Rigid Body ID: "<<rid<<" not enabled yet!"<<endl;
     return false;
 
-  }
-  else
+  } else
     cout<<"No Rigid body activated yet"<<endl;
   return false;
 }
 
 bool OptiTrack::disableRBody(const char* name)
 {
-  if(getRID.size()>0)
-  {
-    for(long i =0; i<(long)getRID.size(); i++)
-    {
-      if(strcmp(sRNames[i].c_str(), name) == 0)
-      {
+  if(getRID.size()>0) {
+    for(long i =0; i<(long)getRID.size(); i++) {
+      if(strcmp(sRNames[i].c_str(), name) == 0) {
         getRID.erase(getRID.begin()+i);
         bRDetails.erase(bRDetails.begin()+i);
         sRNames.erase(sRNames.begin()+i);
@@ -530,18 +478,15 @@ bool OptiTrack::disableRBody(const char* name)
       cout<<"Rigid Body : "<<name<<" not enabled yet!"<<endl;
     return false;
 
-  }
-  else
+  } else
     cout<<"No Rigid body activated yet"<<endl;
   return false;
 }
 
 bool OptiTrack::enableSkeleton(int sid, bool details)
 {
-  for(long int i = 0; i<(long)getSID.size(); i++)
-  {
-    if(sid == getSID[i])
-    {
+  for(long int i = 0; i<(long)getSID.size(); i++) {
+    if(sid == getSID[i]) {
       getSID.push_back(sid);
       bSDetails.push_back(details);
       cout<<"Enabled Skeleton ID "<<sid<<endl;
@@ -556,12 +501,11 @@ bool OptiTrack::enableSkeleton(int sid, bool details)
 
 int OptiTrack::enableSkeleton(const char* skname, bool details)
 {
-  for(long int i=0; i<(long)skeletonname.size(); i++)
-  {
+  for(long int i=0; i<(long)skeletonname.size(); i++) {
     cout << "skeleton name: " << skeletonname[i] << endl;
-    if(strcmp(skeletonname[i].c_str(), skname) == 0)
-    {
-      getSID.push_back(skeletonIDs[i]);		//adding the rigid ID corresponding to rigid name
+    if(strcmp(skeletonname[i].c_str(), skname) == 0) {
+      getSID.push_back(
+        skeletonIDs[i]);		//adding the rigid ID corresponding to rigid name
       bSDetails.push_back(details);
       cout<<"Enabled Skeleton name: "<<skname<<" ID: "<<skeletonIDs[i]<<endl;
       return skeletonIDs[i];
@@ -576,12 +520,9 @@ bool OptiTrack::disableSkeleton(int sid)
 {
   //		getSID[sid] = 0;
   //		bSDetails[sid] = false;
-  if(getSID.size()>0)
-  {
-    for(long i =0; i<(long)getSID.size(); i++)
-    {
-      if(sid == getSID.at(i))
-      {
+  if(getSID.size()>0) {
+    for(long i =0; i<(long)getSID.size(); i++) {
+      if(sid == getSID.at(i)) {
         cout<<"\nSkeleton ID: "<<getSID.at(i)<<" disabled"<<endl;
         getSID.erase(getSID.begin()+i);
         bSDetails.erase(bSDetails.begin()+i);
@@ -591,23 +532,22 @@ bool OptiTrack::disableSkeleton(int sid)
     cout<<"Skeleton ID: "<<sid<<" not enabled yet"<<endl;
     return false;
 
-  }
-  else
+  } else
     cout<<"No Skeleton activated yet"<<endl;
   return false;
 }
 
 
-bool OptiTrack::getRBodyPosition(double* position, int rid, float *timestamp) // getRBodyPose(Vector &pose, int rid, float *timestamp) { pose[0] = rBody[i].x; ... }
+bool OptiTrack::getRBodyPosition(double* position, int rid,
+                                 float *timestamp) // getRBodyPose(Vector &pose, int rid, float *timestamp) { pose[0] = rBody[i].x; ... }
 {
 
   long int i = 0;
-  while(i<(long)getRID.size())
-  {
-    if(rBody[i].ID == rid)
-    {
+  while(i<(long)getRID.size()) {
+    if(rBody[i].ID == rid) {
 
-      if(fabs(rBody[i].x) < INVALID_POS_TOL && fabs(rBody[i].y) < INVALID_POS_TOL && fabs(rBody[i].z) < INVALID_POS_TOL){
+      if(fabs(rBody[i].x) < INVALID_POS_TOL && fabs(rBody[i].y) < INVALID_POS_TOL
+         && fabs(rBody[i].z) < INVALID_POS_TOL) {
         if(bPrintWarnings)
           cout<<"WARNING: Invalid position [0 0 0] detected"<<endl;
         return false;
@@ -623,8 +563,7 @@ bool OptiTrack::getRBodyPosition(double* position, int rid, float *timestamp) //
         (*timestamp) = latency;
       //			mutex->unlock();
       return true;
-    }
-    else
+    } else
       i++;
   }
   if(bPrintWarnings)
@@ -634,14 +573,13 @@ bool OptiTrack::getRBodyPosition(double* position, int rid, float *timestamp) //
 
 }
 
-bool OptiTrack::getRBodyOrientation(double orient[][3], int rid, float *timestamp) // getRBodyPose(Vector &pose, int rid, float *timestamp) { pose[0] = rBody[i].x; ... }
+bool OptiTrack::getRBodyOrientation(double orient[][3], int rid,
+                                    float *timestamp) // getRBodyPose(Vector &pose, int rid, float *timestamp) { pose[0] = rBody[i].x; ... }
 {
 
   long int i = 0;
-  while(i<(long)getRID.size())
-  {
-    if(rBody[i].ID == rid)
-    {
+  while(i<(long)getRID.size()) {
+    if(rBody[i].ID == rid) {
 
       MatrixFromQuat(rBody[i].qx, rBody[i].qy, rBody[i].qz, rBody[i].qw, orient);
 
@@ -652,8 +590,7 @@ bool OptiTrack::getRBodyOrientation(double orient[][3], int rid, float *timestam
         (*timestamp) = latency;
       //			mutex->unlock();
       return true;
-    }
-    else
+    } else
       i++;
   }
   if(bPrintWarnings)
@@ -673,7 +610,8 @@ bool OptiTrack::getRBodyOrientation(double **orient, int rid, float *timestamp)
   return b_opti;
 }
 
-bool OptiTrack::getRBodyOrientation(double **orient, const char* name, float *timestamp)
+bool OptiTrack::getRBodyOrientation(double **orient, const char* name,
+                                    float *timestamp)
 {
   double lOrient[3][3];
   bool b_opti = getRBodyOrientation(lOrient, name, timestamp);
@@ -684,16 +622,16 @@ bool OptiTrack::getRBodyOrientation(double **orient, const char* name, float *ti
 }
 
 
-bool OptiTrack::getRBodyPosition(double* position, const char* name, float *timestamp) // getRBodyPose(Vector &pose, int rid, float *timestamp) { pose[0] = rBody[i].x; ... }
+bool OptiTrack::getRBodyPosition(double* position, const char* name,
+                                 float *timestamp) // getRBodyPose(Vector &pose, int rid, float *timestamp) { pose[0] = rBody[i].x; ... }
 {
   long int i = 0;
 
-  while(i<(long)getRID.size())
-  {
-    if(strcmp(rBody[i].szRBodyName, name) == 0)
-    {
+  while(i<(long)getRID.size()) {
+    if(strcmp(rBody[i].szRBodyName, name) == 0) {
 
-      if(fabs(rBody[i].x) < INVALID_POS_TOL && fabs(rBody[i].y) < INVALID_POS_TOL && fabs(rBody[i].z) < INVALID_POS_TOL){
+      if(fabs(rBody[i].x) < INVALID_POS_TOL && fabs(rBody[i].y) < INVALID_POS_TOL
+         && fabs(rBody[i].z) < INVALID_POS_TOL) {
         if(bPrintWarnings)
           cout<<"WARNING: Invalid position [0 0 0] detected"<<endl;
         return false;
@@ -710,8 +648,7 @@ bool OptiTrack::getRBodyPosition(double* position, const char* name, float *time
 
       //			mutex->unlock();
       return true;
-    }
-    else
+    } else
       i++;
   }
 
@@ -722,14 +659,13 @@ bool OptiTrack::getRBodyPosition(double* position, const char* name, float *time
 }
 
 
-bool OptiTrack::getRBodyOrientation(double orient[][3], const char* name, float *timestamp) // getRBodyPose(Vector &pose, int rid, float *timestamp) { pose[0] = rBody[i].x; ... }
+bool OptiTrack::getRBodyOrientation(double orient[][3], const char* name,
+                                    float *timestamp) // getRBodyPose(Vector &pose, int rid, float *timestamp) { pose[0] = rBody[i].x; ... }
 {
   long int i = 0;
 
-  while(i<(long)getRID.size())
-  {
-    if(strcmp(rBody[i].szRBodyName, name) == 0)
-    {
+  while(i<(long)getRID.size()) {
+    if(strcmp(rBody[i].szRBodyName, name) == 0) {
 
       MatrixFromQuat(rBody[i].qx, rBody[i].qy, rBody[i].qz, rBody[i].qw, orient);
 
@@ -740,8 +676,7 @@ bool OptiTrack::getRBodyOrientation(double orient[][3], const char* name, float 
         (*timestamp) = latency;
       //			mutex->unlock();
       return true;
-    }
-    else
+    } else
       i++;
   }
   if(bPrintWarnings)
@@ -751,19 +686,17 @@ bool OptiTrack::getRBodyOrientation(double orient[][3], const char* name, float 
 
 }
 
-bool OptiTrack::getRBody(Rigid &rbodytemp, int rid, float* timestamp) // getRBodyPose(Vector &pose, int rid, float *timestamp) { pose[0] = rBody[i].x; ... }
+bool OptiTrack::getRBody(Rigid &rbodytemp, int rid,
+                         float* timestamp) // getRBodyPose(Vector &pose, int rid, float *timestamp) { pose[0] = rBody[i].x; ... }
 {
   long int i = 0;
-  while(i<(long)getRID.size())
-  {
-    if(rBody[i].ID == rid)
-    {
+  while(i<(long)getRID.size()) {
+    if(rBody[i].ID == rid) {
       rbodytemp = rBody[i];
       if(timestamp != NULL)
         (*timestamp) = latency;
       return true;
-    }
-    else
+    } else
       i++;
   }
 
@@ -779,14 +712,11 @@ bool OptiTrack::getSkeleton(Skeleton &pskeleton, int sid)
 {
   long int i = 0;
   pskeleton.set = false;
-  while(i<(long)getSID.size())
-  {
-    if(skeletons[i].ID == sid)
-    {
+  while(i<(long)getSID.size()) {
+    if(skeletons[i].ID == sid) {
       pskeleton = skeletons[i];
       return true;
-    }
-    else
+    } else
       i++;
   }
 
@@ -799,12 +729,9 @@ bool OptiTrack::getSkeleton(SPosture *pskeleton, int sid )
   long int i = 0;
   double lPos[3];
 
-  while(i<(long)getSID.size())
-  {
-    if(skeletons[i].ID == sid)
-    {
-      for(int j=0; j<skeletons[i].nRigidBodies; j++)
-      {
+  while(i<(long)getSID.size()) {
+    if(skeletons[i].ID == sid) {
+      for(int j=0; j<skeletons[i].nRigidBodies; j++) {
         pskeleton[j].pos[0] = skeletons[i].RBodies[j].x;
         pskeleton[j].pos[1] = skeletons[i].RBodies[j].y;
         pskeleton[j].pos[2] = skeletons[i].RBodies[j].z;
@@ -817,14 +744,12 @@ bool OptiTrack::getSkeleton(SPosture *pskeleton, int sid )
                        skeletons[i].RBodies[j].qw,
                        pskeleton[j].orient );
 
-        for(int k=0; k<skeletons[i].RBodies[j].nRigidMarkers; k++)
-        {
+        for(int k=0; k<skeletons[i].RBodies[j].nRigidMarkers; k++) {
           lPos[0] = skeletons[i].RBodies[j].RMarkers[k].x;
           lPos[1] = skeletons[i].RBodies[j].RMarkers[k].y;
           lPos[2] = skeletons[i].RBodies[j].RMarkers[k].z;
 
-          if(bCalibrate)
-          {
+          if(bCalibrate) {
             CalibratePos(lPos);
           }
 
@@ -839,8 +764,7 @@ bool OptiTrack::getSkeleton(SPosture *pskeleton, int sid )
           CalibrateOrient(pskeleton[j].orient);
       }
       return true;
-    }
-    else
+    } else
       i++;
   }
 
@@ -862,22 +786,16 @@ int OptiTrack::Refresh()
 
   Stop();
   usleep(100000);
-  if(isOpened)
-  {
+  if(isOpened) {
 
-    if(!receivedata())
-    {
+    if(!receivedata()) {
       cout<<"Cannot receive data!!"<<endl;
       return -1;
-    }
-    else
-    {
+    } else {
       ptr = (char*)pData;
     }
 
-  }
-  else
-  {
+  } else {
     cout<<"Socket not openend!!"<<endl;
     return -1;
   }
@@ -897,8 +815,7 @@ int OptiTrack::Refresh()
   ptr += 2;
 
 
-  if(MessageID == 7)      // FRAME OF MOCAP DATA packet
-  {
+  if(MessageID == 7) {    // FRAME OF MOCAP DATA packet
     // frame number
     memcpy(&frameNumber, ptr, 4);
     ptr += 4;
@@ -909,8 +826,7 @@ int OptiTrack::Refresh()
     ptr += 4;
     //		cout<<"MarkerSets:"<<nMarkerSets<<endl;
 
-    for (int i=0; i < nMarkerSets; i++)
-    {
+    for (int i=0; i < nMarkerSets; i++) {
       // Markerset name
       strcpy(temp, ptr);
       //			cout<<"temp:"<<temp<<endl;
@@ -940,8 +856,7 @@ int OptiTrack::Refresh()
     memcpy(&nRigidBodies, ptr, 4);		//ntemp = no. of rigid bodies
     ptr += 4;
     //		cout<<"read no. of rigid bodies "<<nRigidBodies<<endl;
-    for (int j=0; j < nRigidBodies; j++)
-    {
+    for (int j=0; j < nRigidBodies; j++) {
       // rigid body pos/ori
       memcpy(&ntemp2, ptr+2, 2);
       //			cout<<"\nRigid ID::: "<<ntemp2;
@@ -963,26 +878,28 @@ int OptiTrack::Refresh()
 
 
     // skeletons
-    memcpy(&nSkeletons, ptr, 4); ptr += 4;	//ntemp = no. of skeletons
+    memcpy(&nSkeletons, ptr, 4);
+    ptr += 4;	//ntemp = no. of skeletons
 
-    for (int j=0; j < nSkeletons; j++)
-    {
+    for (int j=0; j < nSkeletons; j++) {
       // skeleton id
       currentpos = (long)ptr - ptrbegin;
       int skeletonID = 0;
-      memcpy(&skeletonID, ptr, 4); ptr += 4;
+      memcpy(&skeletonID, ptr, 4);
+      ptr += 4;
       int nRigidBodies = 0;
-      memcpy(&nRigidBodies, ptr, 4); ptr += 4;
+      memcpy(&nRigidBodies, ptr, 4);
+      ptr += 4;
 
       skeletonIDs.push_back(skeletonID);
       skeletonpos.push_back(currentpos);
       skeletons.push_back(skeletontemp);
 
-      for (int i=0; i < nRigidBodies; i++)
-      {
+      for (int i=0; i < nRigidBodies; i++) {
         ptr += 8*4;                            // rigid body pos/ori
 
-        memcpy(&ntemp2, ptr, 4); ptr += 4;
+        memcpy(&ntemp2, ptr, 4);
+        ptr += 4;
 
         ptr += ntemp2*3*4;       // associated marker positions
         ptr += ntemp2*4;         // associated marker IDs
@@ -995,9 +912,11 @@ int OptiTrack::Refresh()
     // latency
     latencypos = (long)ptr - ptrbegin;
     latency = 0.0f;
-    memcpy(&latency, ptr, 4); ptr += 4;
+    memcpy(&latency, ptr, 4);
+    ptr += 4;
 
-    int eod = 0; memcpy(&eod, ptr, 4);
+    int eod = 0;
+    memcpy(&eod, ptr, 4);
 
     //		cout<<"latency: "<<latency;
 
@@ -1013,14 +932,12 @@ int OptiTrack::Refresh()
     cout<<skeletonIDs.size()<<" Skeletons found."<<endl;
   }
 
-  else
-  {
+  else {
     printf("Unrecognized Packet Type while refreshing frame of data.\n");
     return -1;
   }
 
-  if(!commandsocket())
-  {
+  if(!commandsocket()) {
     cout<<"Command socket failed!!"<<endl;
     return -1;
   }
@@ -1035,21 +952,20 @@ int OptiTrack::Refresh()
   //	cout<<"\nByteCount: "<<nBytes;
   ptr += 2;
 
-  if(MessageID == 5)
-  {
+  if(MessageID == 5) {
     bool bfound;
 
     nDatasets = 0;
-    memcpy(&nDatasets, ptr, 4); ptr += 4;
+    memcpy(&nDatasets, ptr, 4);
+    ptr += 4;
     //		cout<<endl<<"Dataset Count : "<<nDatasets;
-    for(int i=0; i < nDatasets; i++)
-    {
+    for(int i=0; i < nDatasets; i++) {
       type = 0;
-      memcpy(&type, ptr, 4); ptr += 4;
+      memcpy(&type, ptr, 4);
+      ptr += 4;
       //			cout<<"\nType:"<<type;
 
-      if(type == 0)   // markerset
-      {
+      if(type == 0) { // markerset
         // name
         strcpy(markerSets[MSCount].szMSetName, ptr);
         nDataBytes = (int) strlen(markerSets[MSCount].szMSetName) + 1;
@@ -1059,11 +975,11 @@ int OptiTrack::Refresh()
         // marker data
         markerSets[MSCount].nSetMarkers =0;
 
-        memcpy(&markerSets[MSCount].nSetMarkers, ptr, 4); ptr += 4;
+        memcpy(&markerSets[MSCount].nSetMarkers, ptr, 4);
+        ptr += 4;
         //				printf("Marker Count : %d\n", nMarkers);
 
-        for(int j=0; j < markerSets[MSCount].nSetMarkers; j++)
-        {
+        for(int j=0; j < markerSets[MSCount].nSetMarkers; j++) {
           //					char szName[256];
           strcpy(markerSets[MSCount].MSMarkers[j].szMarkerName, ptr);
           nDataBytes = (int) strlen(markerSets[MSCount].MSMarkers[j].szMarkerName) + 1;
@@ -1071,9 +987,7 @@ int OptiTrack::Refresh()
           //					printf("Marker Name: %s\n", szName);
         }
         MSCount++;
-      }
-      else if(type ==1)   // rigid body
-      {
+      } else if(type ==1) { // rigid body
         //				if(major >= 2)
         //				{
         // name
@@ -1084,14 +998,13 @@ int OptiTrack::Refresh()
         //				}
 
         //					rBody[RBCount].ID = 0;
-        memcpy(&ntemp, ptr,2); ptr +=4;
+        memcpy(&ntemp, ptr,2);
+        ptr +=4;
         //				printf("ID : %d\n", ID);
 
         bfound = false;
-        for(long int k=0; k<(long)RigidIDs.size();k++)
-        {
-          if(ntemp == RigidIDs[k])
-          {
+        for(long int k=0; k<(long)RigidIDs.size(); k++) {
+          if(ntemp == RigidIDs[k]) {
             //strcpy(Rigidname[k], temp);
             Rigidname.push_back(temp);
             //						cout<<endl<<"Rigid Name: "<<temp<<endl;
@@ -1100,8 +1013,7 @@ int OptiTrack::Refresh()
           }
         }
 
-        if(!bfound)
-        {
+        if(!bfound) {
           cout<<"\nRigid Body ID: "<<ntemp<<" in data descriptor message is not present in frameofdata message!"
               <<"\nIgnoring Rigid Body ID: "<<ntemp<<" name:"<<temp<<endl;
           //return -1;
@@ -1121,30 +1033,26 @@ int OptiTrack::Refresh()
         //					float zoffset = 0; memcpy(&zoffset, ptr, 4);
         ptr +=4;
         //					printf("Z Offset : %3.2f\n", zoffset);
-      }
-      else if(type ==2)   // skeleton
-      {
+      } else if(type ==2) { // skeleton
         strcpy(temp, ptr);
         ptr += strlen(ptr) + 1;
         //				printf("Name: %s\n", szName);
 
         //					skeletons[SKCount].ID = 0;
-        memcpy(&ntemp, ptr, 4); ptr +=4;
+        memcpy(&ntemp, ptr, 4);
+        ptr +=4;
         //				printf("ID : %d\n", ID);
 
         bfound = false;
         long int k;
-        for(k=0; k<(long)skeletonIDs.size(); k++)
-        {
-          if(ntemp == skeletonIDs[k])
-          {
+        for(k=0; k<(long)skeletonIDs.size(); k++) {
+          if(ntemp == skeletonIDs[k]) {
             skeletonname.push_back(temp);
             bfound = true;
             break;
           }
         }
-        if(!bfound)
-        {
+        if(!bfound) {
           cout<<"\nSkeleton ID: "<<ntemp<<" in data descriptor message is not present in frameofdata message!"
               <<"\nIgnoring Skeleton ID: "<<ntemp<<" name:"<<temp<<endl;
           return -1;
@@ -1157,8 +1065,7 @@ int OptiTrack::Refresh()
         ptr +=4;
         //				printf("RigidBody (Bone) Count : %d\n", nRigidBodies);
 
-        for(int l=0; l< ntemp; l++)		//ntemp = no. of rigid bodies in the skeleton
-        {
+        for(int l=0; l< ntemp; l++) {	//ntemp = no. of rigid bodies in the skeleton
           //					if(major >= 2)
           //					{
           // RB name
@@ -1204,8 +1111,7 @@ int OptiTrack::Refresh()
     return 1;
   }
 
-  else
-  {
+  else {
     printf("Unrecognized Packet Type while refreshing model description.\n");
     return -1;
   }
@@ -1218,19 +1124,14 @@ int OptiTrack::Update()
 {
   double lPos[3];
 
-  if(bUseThread)
-  {
-    if(!bStart)
-    {
+  if(bUseThread) {
+    if(!bStart) {
       if(bPrintWarnings)
         cout<<"Thread not working!"<<endl;
       return -2;
     }
-  }
-  else
-  {
-    if(!receivedata())
-    {
+  } else {
+    if(!receivedata()) {
       if(bPrintWarnings)
         cout<<"ERROR: Cannot receive data!!"<<endl;
       return -1;
@@ -1238,21 +1139,20 @@ int OptiTrack::Update()
 
   }
 
-  if(bUseThread){
+  if(bUseThread) {
     mutex->lock();
   }
 
   ptr = (char*)pData;
 
-  if(bUseThread){
+  if(bUseThread) {
     mutex->unlock();
   }
 
   memcpy(&MessageID, ptr, 2);
   ptr += 2;
 
-  if (MessageID != 7)
-  {
+  if (MessageID != 7) {
     if(bPrintWarnings)
       cout<<"\nDifferent Message ID: "<<MessageID;
     return -1;
@@ -1270,11 +1170,9 @@ int OptiTrack::Update()
   ptr += 4;
 
 
-  if(MarkerSetpos.size()>0)
-  {
+  if(MarkerSetpos.size()>0) {
     //		cout<<"\nMarkerSet found"<<endl;
-    for( long i =0; i< (long)MarkerSetpos.size(); i++)
-    {
+    for( long i =0; i< (long)MarkerSetpos.size(); i++) {
       ptr = (char*)pData;
       ptr += MarkerSetpos[i];
       //			if(bfirstrun)
@@ -1289,8 +1187,7 @@ int OptiTrack::Update()
       memcpy(&markerSets[i].nSetMarkers, ptr, 4);
       ptr += 4;
 
-      for(int j=0; j < markerSets[i].nSetMarkers; j++)
-      {
+      for(int j=0; j < markerSets[i].nSetMarkers; j++) {
         memcpy(&markerSets[i].MSMarkers[j].x, ptr, 4);
         ptr += 4;
         memcpy(&markerSets[i].MSMarkers[j].y, ptr, 4);
@@ -1304,20 +1201,14 @@ int OptiTrack::Update()
 
       }
     }
-  }
-  else
-  {
+  } else {
     //		cout<<"\nNo marker Set Found in data";
   }
 
-  if(getRID.size()>0)
-  {
-    for(long j = 0; j<(long)getRID.size(); j++)
-    {
-      for(long i = 0; i<(long)RigidIDs.size(); i++)
-      {
-        if (getRID[j] == RigidIDs[i])
-        {
+  if(getRID.size()>0) {
+    for(long j = 0; j<(long)getRID.size(); j++) {
+      for(long i = 0; i<(long)RigidIDs.size(); i++) {
+        if (getRID[j] == RigidIDs[i]) {
           //					if (bfirstrun)
           //						rBody.push_back(rigidtemp);
           //					cout<<"\nFound Rigid Body ID: "<<getRID[j];
@@ -1327,8 +1218,7 @@ int OptiTrack::Update()
           ptr += Rigidpos[i];			//going to the position of rigid body data
           memcpy(&rBody[j].ID, ptr+2, 2);
           ptr += 4;
-          if(rBody[j].ID != RigidIDs[i])
-          {
+          if(rBody[j].ID != RigidIDs[i]) {
             cout<<"ERROR: Update Failed! RBody ID mismatch."<<endl;
             return -2;
           }
@@ -1377,11 +1267,9 @@ int OptiTrack::Update()
           //					cout<<"\nNo. of Markers in RBody ID: "<<rBody[j].ID<<" = "<<rBody[j].nRigidMarkers;
           ptr += 4;
           int max = rBody[j].nRigidMarkers;
-          if(rBody[j].bMarkers)		//read associated marker details
-          {
+          if(rBody[j].bMarkers) {	//read associated marker details
 
-            for (int i=0; i< max; i++)
-            {
+            for (int i=0; i< max; i++) {
               memcpy(&rBody[j].RMarkers[i].x, ptr, 4);
               ptr += 4;
               memcpy(&rBody[j].RMarkers[i].y, ptr, 4);
@@ -1398,20 +1286,16 @@ int OptiTrack::Update()
 
             }
             // associated marker IDs
-            for (int i=0; i< max; i++)
-            {
+            for (int i=0; i< max; i++) {
               memcpy(&rBody[j].RMarkers[i].nMarkerID, ptr+2, 2);
               ptr +=4;
             }
             // associated marker sizes
-            for (int i=0; i< max; i++)
-            {
+            for (int i=0; i< max; i++) {
               memcpy(&rBody[j].RMarkers[i].fMarkerSize, ptr, 4);
               ptr +=4;
             }
-          }
-          else
-          {
+          } else {
             ptr += 4*5*rBody[j].nRigidMarkers;
           }
           //
@@ -1424,28 +1308,22 @@ int OptiTrack::Update()
 
       }
     }
-  }
-  else
-  {
+  } else {
     //		cout<<"\nNo rigid bodies enabled";
   }
 
-  if(getSID.size()>0)
-  {
-    for(long j = 0; j<(long)getSID.size(); j++)
-    {
-      for(long i = 0; i<(long)skeletonIDs.size(); i++)
-      {
-        if(getSID[j] == skeletonIDs[i])
-        {
+  if(getSID.size()>0) {
+    for(long j = 0; j<(long)getSID.size(); j++) {
+      for(long i = 0; i<(long)skeletonIDs.size(); i++) {
+        if(getSID[j] == skeletonIDs[i]) {
           //					if(bfirstrun)
           //						skeletons.push_back(skeletontemp);
           // cout<<"\nFound Skeleton ID: "<<skeletonIDs[i];
           ptr = (char*)pData;
           ptr += skeletonpos[i];
-          memcpy(&skeletons[j].ID, ptr, 4); ptr += 4;
-          if(skeletons[j].ID != skeletonIDs[i])
-          {
+          memcpy(&skeletons[j].ID, ptr, 4);
+          ptr += 4;
+          if(skeletons[j].ID != skeletonIDs[i]) {
             cout<<"\nSkeleton IDs mismatch. Refresh required."<<endl;
             return -2;
 
@@ -1455,10 +1333,10 @@ int OptiTrack::Update()
           //					skeletons[j].ID = skeletonIDs[i];
 
           skeletons[j].bMarkers = bSDetails[i];
-          memcpy(&skeletons[j].nRigidBodies, ptr, 4); ptr += 4;
+          memcpy(&skeletons[j].nRigidBodies, ptr, 4);
+          ptr += 4;
 
-          for(int l=0; l<skeletons[j].nRigidBodies; l++ )
-          {
+          for(int l=0; l<skeletons[j].nRigidBodies; l++ ) {
             strcpy(skeletons[j].RBodies[l].szRBodyName, skrigidname[i][l] );
             memcpy(&skeletons[j].RBodies[l].ID, ptr, 4);
             ptr += 4;
@@ -1481,8 +1359,7 @@ int OptiTrack::Update()
             skeletons[j].RBodies[l].y *= 0.001;
             skeletons[j].RBodies[l].z *= 0.001;
 
-            if(bCalibrate && l==0)
-            {
+            if(bCalibrate && l==0) {
               lPos[0] = skeletons[j].RBodies[l].x;
               lPos[1] = skeletons[j].RBodies[l].y;
               lPos[2] = skeletons[j].RBodies[l].z;
@@ -1511,10 +1388,8 @@ int OptiTrack::Update()
             memcpy(&skeletons[j].RBodies[l].nRigidMarkers, ptr, 4);
             //cout << skeletons[j].RBodies[l].nRigidMarkers << endl;
             ptr += 4;
-            if (skeletons[j].bMarkers)		//whether to read marker details
-            {
-              for (int k=0; k<skeletons[j].RBodies[l].nRigidMarkers; k++)
-              {
+            if (skeletons[j].bMarkers) {	//whether to read marker details
+              for (int k=0; k<skeletons[j].RBodies[l].nRigidMarkers; k++) {
                 memcpy(&skeletons[j].RBodies[l].RMarkers[k].x, ptr, 4);
                 ptr += 4;
                 memcpy(&skeletons[j].RBodies[l].RMarkers[k].y, ptr, 4);
@@ -1528,21 +1403,17 @@ int OptiTrack::Update()
               }
 
               // associated marker IDs
-              for (int k=0; k<skeletons[j].RBodies[l].nRigidMarkers; k++)
-              {
+              for (int k=0; k<skeletons[j].RBodies[l].nRigidMarkers; k++) {
                 memcpy(&skeletons[j].RBodies[l].RMarkers[k].ID, ptr, 4);
                 ptr += 4;
               }
 
               // associated marker sizes
-              for (int k=0; k<skeletons[j].RBodies[l].nRigidMarkers; k++)
-              {
+              for (int k=0; k<skeletons[j].RBodies[l].nRigidMarkers; k++) {
                 memcpy(&skeletons[j].RBodies[l].RMarkers[k].fMarkerSize, ptr, 4);
                 ptr += 4;
               }
-            }
-            else
-            {
+            } else {
               ptr += skeletons[j].RBodies[l].nRigidMarkers*(3+1+1)*4;
             }
 
@@ -1553,9 +1424,7 @@ int OptiTrack::Update()
         }
       }
     }
-  }
-  else
-  {
+  } else {
     //		cout<<"\nNo Skeleton enabled";
   }
 
@@ -1595,24 +1464,21 @@ bool OptiTrack::SocketOpen(const char* local_ip)
 
 
 
-  if(sd < 0)
-  {
+  if(sd < 0) {
     perror("Opening datagram socket error");
     return false;
-  }
-  else
+  } else
     printf("Opening datagram socket....OK.\n");
   /* Enable SO_REUSEADDR to allow multiple instances of this */
   /* application to receive copies of the multicast datagrams. */
 
   int reuse = 1;
-  if(setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char *)&reuse, sizeof(reuse)) < 0 )
-  {
+  if(setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char *)&reuse,
+                sizeof(reuse)) < 0 ) {
     perror("Setting SO_REUSEADDR error");
     close(sd);
     return false;
-  }
-  else
+  } else
     printf("Setting SO_REUSEADDR...OK.\n");
 
   /* Bind to the proper port number with the IP address */
@@ -1623,13 +1489,11 @@ bool OptiTrack::SocketOpen(const char* local_ip)
   localSock.sin_family = AF_INET;
   localSock.sin_port = htons(DPORT);
   localSock.sin_addr.s_addr = INADDR_ANY;
-  if(bind(sd, (struct sockaddr*)&localSock, sizeof(localSock)))
-  {
+  if(bind(sd, (struct sockaddr*)&localSock, sizeof(localSock))) {
     perror("Binding datagram socket error");
     close(sd);
     return false;
-  }
-  else
+  } else
     printf("Binding datagram socket...OK.\n");
   /* Join the multicast group 226.1.1.1 on the local 203.106.93.94 */
   /* interface. Note that this IP_ADD_MEMBERSHIP option must be */
@@ -1638,13 +1502,12 @@ bool OptiTrack::SocketOpen(const char* local_ip)
   //    group.imr_multiaddr.s_addr = inet_addr("239.255.42.99");
   group.imr_multiaddr.s_addr = inet_addr("239.255.42.99");
   group.imr_interface.s_addr = inet_addr(local_ip);
-  if(setsockopt(sd, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *)&group, sizeof(group)) < 0)
-  {
+  if(setsockopt(sd, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *)&group,
+                sizeof(group)) < 0) {
     perror("Adding multicast group error");
     close(sd);
     return false;
-  }
-  else
+  } else
     printf("Adding multicast group...OK.\n");
 
   nlengthofsztemp = 64;		//from packetclient.cpp
@@ -1652,8 +1515,7 @@ bool OptiTrack::SocketOpen(const char* local_ip)
 
 
   // Create a blocking, datagram socket for command socket
-  if ((sc=socket(AF_INET, SOCK_DGRAM, 0)) < 0)
-  {
+  if ((sc=socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
     cout<<"Command socket could not be set."<<endl;
     return false;
   }
@@ -1664,8 +1526,7 @@ bool OptiTrack::SocketOpen(const char* local_ip)
   my_addr.sin_port = htons(0);
   my_addr.sin_addr.s_addr = INADDR_ANY;
 
-  if (bind(sc, (struct sockaddr *)&my_addr, sizeof(struct sockaddr)) < 0)
-  {
+  if (bind(sc, (struct sockaddr *)&my_addr, sizeof(struct sockaddr)) < 0) {
     close(sc);
     cout<<"Command socket binding error"<<endl;
     return false;
@@ -1673,8 +1534,8 @@ bool OptiTrack::SocketOpen(const char* local_ip)
 
   // set to broadcast mode
   ivalue = 1;
-  if (setsockopt(sc, SOL_SOCKET, SO_BROADCAST, (char *)&ivalue, sizeof(ivalue)) < 0)
-  {
+  if (setsockopt(sc, SOL_SOCKET, SO_BROADCAST, (char *)&ivalue,
+                 sizeof(ivalue)) < 0) {
     close(sc);
     cout<<"Command socket broadcast error"<<endl;
     return false;
@@ -1692,27 +1553,23 @@ bool OptiTrack::receivedata()
   int datalen = sizeof(pData);
   int size;
 
-  if(!bUseThread)
-  {
+  if(!bUseThread) {
     // Wait for data on socket until timeout
     struct timeval timeout;
     timeout.tv_sec = 1;
     timeout. tv_usec = 0;
     int read_result = select(sd+1, &mFdset, NULL, NULL, &timeout);
-    if(read_result == -1)
-    {
+    if(read_result == -1) {
       cout<<"ERROR: cannot select socket!"<<endl;
       return false;
     }
-    if(!read_result)
-    {
+    if(!read_result) {
       cout<<"ERROR: socket timeout occured!"<<endl;
       return false;
     }
   }
 
-  if((size=read(sd, (char*)pData, datalen)) < 0)
-  {
+  if((size=read(sd, (char*)pData, datalen)) < 0) {
     cout<<"Reading datagram message error!"<<endl;
     return false;
   }
@@ -1729,7 +1586,8 @@ bool OptiTrack::commandsocket()
   setsockopt(sc, SOL_SOCKET, SO_RCVBUF, (char *)&optval, 4);
   //    getsockopt(sc, SOL_SOCKET, SO_RCVBUF, (char *)&optval, &optval_size);
 
-  getsockopt(sc, SOL_SOCKET, SO_RCVBUF, (char *)&optval, (socklen_t *)&optval_size);
+  getsockopt(sc, SOL_SOCKET, SO_RCVBUF, (char *)&optval,
+             (socklen_t *)&optval_size);
 
 
   memset(&HostAddr, 0, sizeof(HostAddr));
@@ -1752,9 +1610,9 @@ bool OptiTrack::commandsocket()
   PacketOut.iMessage = NAT_REQUEST_MODELDEF;
   PacketOut.nDataBytes = 0;
   nTries = 3;
-  while (nTries--)
-  {
-    int iRet = sendto(sc, (char *)&PacketOut, 4 + PacketOut.nDataBytes, 0, (sockaddr *)&HostAddr, sizeof(HostAddr));
+  while (nTries--) {
+    int iRet = sendto(sc, (char *)&PacketOut, 4 + PacketOut.nDataBytes, 0,
+                      (sockaddr *)&HostAddr, sizeof(HostAddr));
     if(iRet <0)
       break;
   }
@@ -1766,16 +1624,15 @@ bool OptiTrack::commandsocket()
   addr_len = sizeof(struct sockaddr);
 
   nTries = 3;
-  while(nTries--)
-  {
+  while(nTries--) {
 
-    nDataBytesReceived = recvfrom( sc,(char *)&PacketIn, sizeof(sPacket), 0, (struct sockaddr *)&TheirAddress, (socklen_t *)&addr_len);
+    nDataBytesReceived = recvfrom( sc,(char *)&PacketIn, sizeof(sPacket), 0,
+                                   (struct sockaddr *)&TheirAddress, (socklen_t *)&addr_len);
 
     if((nDataBytesReceived == 0) || (nDataBytesReceived == SOCKET_ERROR) )
       continue;
 
-    if(PacketIn.iMessage == NAT_PINGRESPONSE)
-    {
+    if(PacketIn.iMessage == NAT_PINGRESPONSE) {
       cout<<"\n Natnet Version: "<<(int)PacketIn.Data.Sender.NatNetVersion[0]<<"."
           <<(int)PacketIn.Data.Sender.NatNetVersion[1]<<"."
           <<(int)PacketIn.Data.Sender.NatNetVersion[2]<<"."
@@ -1787,8 +1644,7 @@ bool OptiTrack::commandsocket()
       return false;
     }
 
-    else if(PacketIn.iMessage!=NAT_MODELDEF)
-    {
+    else if(PacketIn.iMessage!=NAT_MODELDEF) {
       cout<<"\n Model Definition not received. Retrying..."<<endl;
       cout<<"\n packetin message:"<<PacketIn.iMessage;
 
