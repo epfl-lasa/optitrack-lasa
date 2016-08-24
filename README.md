@@ -1,6 +1,13 @@
-# Motion Capture at LASA using Optitrack.
+# This package is no longer used
 
-This package streams ROS tf frames using the optitrack data.
+The current package is here:
+https://github.com/epfl-lasa/mocap_optitrack
+
+It is compatible with the current version of Motive and the new cameras.
+
+-------------------
+
+The following instructions are left as old reference.
 
 # Instructions
 
